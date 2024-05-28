@@ -20,14 +20,14 @@ resource "aws_subnet" "public-subnet" {
   }
 }
 
-resource "aws_subnet" "private-subnet" {
+resource "aws_subnet" "management-subnet" {
   cidr_block = "10.0.2.0/24"
   vpc_id     = aws_vpc.demo-vpc.id
 
   availability_zone = "us-east-1a"
 
   tags = {
-    Name = "private-subnet"
+    Name = "management-subnet"
   }
 }
 
@@ -74,7 +74,7 @@ resource "aws_network_interface" "primary-network-interface" {
 }
 
 resource "aws_network_interface" "secondary-network-interface" {
-  subnet_id       = aws_subnet.private-subnet.id
+  subnet_id       = aws_subnet.management-subnet.id
   private_ips     = ["10.0.2.50"]
   security_groups = [aws_security_group.allow-ssh.id]
 
@@ -169,4 +169,5 @@ resource "aws_instance" "my-server" {
 resource "aws_eip" "eip" {
   network_interface = aws_network_interface.primary-network-interface.id
   vpc               = true
+  depends_on        = [aws_instance.my-server]
 }
